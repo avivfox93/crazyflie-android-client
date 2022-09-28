@@ -11,6 +11,9 @@ More information:
  - [Crazyflie Android client user guide](/docs/userguides/user-instructions.md)
  - [Crazyflie Android client development guide](/docs/development/android-development.md)
 
+## Changed in this fork
+1. Increased MTU for supporting ESP32 without splitting packets
+
 ## Contributions
 
 Please check the contribution guide in [CONTRIBUTING.md](CONTRIBUTING.md). Also to the [contribute page](https://www.bitcraze.io/contribute/) on our website to learn more.
