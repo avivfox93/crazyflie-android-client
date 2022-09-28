@@ -29,6 +29,7 @@ package se.bitcraze.crazyfliecontrol.ble;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -65,7 +66,7 @@ import se.bitcraze.crazyflie.lib.crtp.CrtpPacket;
 
 @SuppressLint("NewApi")
 public class BleLink extends CrtpDriver {
-
+    private static final int MTU = 200;
     private final Logger mLogger = LoggerFactory.getLogger("BLELink");
 
     // Set to -40 to connect only to close-by Crazyflie
@@ -123,6 +124,7 @@ public class BleLink extends CrtpDriver {
                 mGatt = gatt;
                 mRssiTimer = new Timer();
                 mRssiTimer.schedule(rssiTask, 1000, 1000);
+                gatt.requestMtu(MTU);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mLogger.debug("onConnectionStateChange: STATE_DISCONNECTED");
                 // This is necessary to handle a disconnect on the copter side
@@ -390,7 +392,8 @@ public class BleLink extends CrtpDriver {
         if (!mWriteWithAnswer && ((ctr++)%2 == 0)) {
             return;
         }
-        if (packet.getPayload().length <= 20) {
+//        mLogger.debug(String.format(Locale.ENGLISH,"Packet Size: %d",packet.toByteArray().length));
+        if (packet.getPayload().length <= MTU) {
             //send normal CRTP packet
             mContext.runOnUiThread(new SendBlePacket(packet));
         } else {
@@ -491,6 +494,7 @@ public class BleLink extends CrtpDriver {
                     characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                     mWritten = true;
                 }
+//                mLogger.debug(String.format(Locale.ENGLISH,"Sent %d of data",ba.length));
                 characteristic.setValue(ba);
                 if (mGatt != null) {
                     mGatt.writeCharacteristic(characteristic);
